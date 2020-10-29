@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<style>
+
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    text-align: center;
+    width: 600px;
+    position: relative;
+  }
+  
+  .arrow {
+    display: inline-block;
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    margin-left: 50%;
+    margin-top: 50%;
+    margin-bottom: 50%;
+    margin-right: 50%;
+    background: transparent;
+    text-indent: -9999px;
+    border-top: 2px solid #bfbfbf;
+    border-left: 2px solid #bfbfbf;
+    transition: all 250ms ease-in-out;
+    text-decoration: none;
+    color: transparent;
+  }
+  
+  .arrow:hover {
+    border-color: gray;
+    border-width: 5px;
+  }
+  
+  .arrow:before {
+    display: block;
+    height: 200%;
+    width: 200%;
+    margin-left: 50%;
+    margin-top: 50%;
+    margin-bottom: 50%;
+    margin-right: 50%;
+    content: "";
+  }
+  
+  .arrow{
+    transform: rotate(45deg);
+  }
+
+</style>
+
+</head>
+
+
+<body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    <a href="#" title="Previous" class="arrow">&laquo; previous</a>
+
+    <script>
+let dataJSON;
+// The server has to send out the source and destination (which was just converted from a json to string)
+// To the arrow client, so that it can update the arrow accordingly
+function getFromServer(){
+    $.get('http://localhost:3000', function(data){
+
+    dataJSON = JSON.parse(data);
+    
+    let p2 = dataJSON.final;
+    let p1 = dataJSON.current;
+    console.log(p2);
+
+    console.log(p2.destLng);
+
+    let dLon = (p2.destLng - p1.sourceLng);
+    let y = Math.sin(dLon) * Math.cos(p2.destLat);
+    let x = Math.cos(p1.sourceLat) * Math.sin(p2.destLat) - Math.sin(p1.sourceLat)
+            * Math.cos(p2.destLat) * Math.cos(dLon);
+
+    let brng = Math.atan2(y, x);
+
+    brng = brng* (180/Math.pi);
+
+    $(".arrow").css("transform","rotate({brng})")
+
+    });
+
+}
+
+// See if the position is updated every 3 seconds, so that you can update the arrow accordingly.
+setInterval(getFromServer, 3000);
+
+    </script>
+
+</body>
+
+
+</html>
